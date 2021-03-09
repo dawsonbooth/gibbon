@@ -23,6 +23,7 @@ gibbon = "gibbon.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.6"
+tqdm = "^4.59.0"
 
 [tool.poetry.dev-dependencies]
 autoflake = "^1.4"
