@@ -1,11 +1,11 @@
-# `REPO_NAME`
+# `gibbon`
 
-[![pypi version](https://img.shields.io/pypi/v/PACKAGE_NAME.svg?style=flat)](https://pypi.org/pypi/PACKAGE_NAME/)
-[![downloads](https://pepy.tech/badge/PACKAGE_NAME)](https://pepy.tech/project/PACKAGE_NAME)
-[![build status](https://github.com/dawsonbooth/REPO_NAME/workflows/build/badge.svg)](https://github.com/dawsonbooth/REPO_NAME/actions?workflow=build)
-[![python versions](https://img.shields.io/pypi/pyversions/PACKAGE_NAME.svg?style=flat)](https://pypi.org/pypi/PACKAGE_NAME/)
-[![format](https://img.shields.io/pypi/format/PACKAGE_NAME.svg?style=flat)](https://pypi.org/pypi/PACKAGE_NAME/)
-[![license](https://img.shields.io/pypi/l/PACKAGE_NAME.svg?style=flat)](https://github.com/dawsonbooth/REPO_NAME/blob/master/LICENSE)
+[![pypi version](https://img.shields.io/pypi/v/gibbon.svg?style=flat)](https://pypi.org/pypi/gibbon/)
+[![downloads](https://pepy.tech/badge/gibbon)](https://pepy.tech/project/gibbon)
+[![build status](https://github.com/dawsonbooth/gibbon/workflows/build/badge.svg)](https://github.com/dawsonbooth/gibbon/actions?workflow=build)
+[![python versions](https://img.shields.io/pypi/pyversions/gibbon.svg?style=flat)](https://pypi.org/pypi/gibbon/)
+[![format](https://img.shields.io/pypi/format/gibbon.svg?style=flat)](https://pypi.org/pypi/gibbon/)
+[![license](https://img.shields.io/pypi/l/gibbon.svg?style=flat)](https://github.com/dawsonbooth/gibbon/blob/master/LICENSE)
 
 ## Description
 
@@ -16,7 +16,7 @@ This is a short or long textual description of the package.
 With [Python](https://www.python.org/downloads/) installed, simply run the following command to add the package to your project.
 
 ```bash
-python -m pip install PACKAGE_NAME
+python -m pip install gibbon
 ```
 
 ## Usage
@@ -46,7 +46,7 @@ Then some output (console or file whatever)
 Output here I guess
 ```
 
-Feel free to [check out the docs](https://dawsonbooth.github.io/REPO_NAME/) for more information.
+Feel free to [check out the docs](https://dawsonbooth.github.io/gibbon/) for more information.
 
 ## License
 

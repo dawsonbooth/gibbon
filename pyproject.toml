@@ -1,13 +1,13 @@
 [tool.poetry]
-name = "PACKAGE_NAME"
+name = "gibbon"
 version = "0.1.0"
 description = ""
 authors = ["Dawson Booth <pypi@dawsonbooth.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/dawsonbooth/REPO_NAME"
-repository = "https://github.com/dawsonbooth/REPO_NAME"
-documentation = "https://dawsonbooth.github.io/REPO_NAME"
+homepage = "https://github.com/dawsonbooth/gibbon"
+repository = "https://github.com/dawsonbooth/gibbon"
+documentation = "https://dawsonbooth.github.io/gibbon"
 keywords = []
 classifiers = [
     "Environment :: Console",
@@ -16,10 +16,10 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 include = ["LICENSE"]
-packages = [{ include = "MODULE_NAME" }]
+packages = [{ include = "gibbon" }]
 
 [tool.poetry.scripts]
-PACKAGE_NAME = "MODULE_NAME.__main__:main"
+gibbon = "gibbon.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.6"
@@ -45,7 +45,7 @@ profile = "black"
 line-length = 119
 
 [tool.portray]
-modules = ["MODULE_NAME"]
+modules = ["gibbon"]
 
 [[tool.portray.extra_markdown_extensions]]
 [tool.portray.extra_markdown_extensions.toc]
@@ -56,8 +56,8 @@ permalink = true
 linenums = true
 
 [tool.portray.mkdocs]
-site_name = "PACKAGE_NAME"
-site_url = "https://dawsonbooth.github.io/REPO_NAME/"
+site_name = "gibbon"
+site_url = "https://dawsonbooth.github.io/gibbon/"
 edit_uri = "blob/master/"
 
 markdown_extensions = [
