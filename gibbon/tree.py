@@ -4,11 +4,11 @@ import os
 import shutil
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
-from typing import Callable, Dict, Generic, List, Tuple, Union
+from typing import Callable, Generic, List, Tuple, Union
 
 from tqdm import tqdm
 
-from gibbon.types import T
+from .types import T
 
 
 class Tree(Generic[T]):
@@ -19,14 +19,14 @@ class Tree(Generic[T]):
 
     sources: Tuple[Path, ...]
     destinations: List[Path]
-    transformations: Dict[str, Callable[[Union[T, Path]], Path]]  # FIXME: https://github.com/python/mypy/issues/3737
+    transformations: List[Callable[[T], Path]]  # FIXME: https://github.com/python/mypy/issues/3737
     should_resolve: bool
 
     def __init__(
         self,
         root_folder: Union[str, os.PathLike[str]],
-        glob: str = "**/*.slp",
-        parse: Callable[[Path], Union[T, Path]] = Path,  # FIXME: https://github.com/python/mypy/issues/3737
+        glob: str = "**/*.*",
+        parse: Callable[[Path], T] = Path,  # type: ignore  # FIXME: https://github.com/python/mypy/issues/3737
         show_progress: bool = False,
     ):
         self.root = Path(root_folder)
@@ -38,13 +38,17 @@ class Tree(Generic[T]):
     def reset(self) -> Tree:
         self.sources = tuple(self.root.glob(self.glob))
         self.destinations = list(self.sources)
-        self.transformations = dict()
+        self.transformations = list()
 
         return self
 
+    def transform(self, *transformations: Callable[[T], Path]) -> None:
+        for transform in transformations:
+            self.transformations.append(transform)
+
     def resolve(self) -> Tree:
         with ProcessPoolExecutor() as executor:
-            parsed_sources = (p for p in executor.map(Path, self.sources))
+            parsed_sources = executor.map(self.parse, self.sources)
         destinations = self.destinations
         if self.show_progress:
             parsed_sources = tqdm(parsed_sources, desc="Process paths", total=len(self.sources))
@@ -53,7 +57,7 @@ class Tree(Generic[T]):
         for i, parsed_source in enumerate(parsed_sources):
             # Perform transformations
             try:
-                for transform in self.transformations.values():
+                for transform in self.transformations:
                     self.destinations[i] = transform(parsed_source)
             except Exception as e:
                 self.destinations[i] = self.root / e.__class__.__name__ / self.destinations[i].name
