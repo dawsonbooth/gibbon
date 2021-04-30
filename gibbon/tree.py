@@ -4,53 +4,56 @@ import os
 import shutil
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
-from typing import Generic, List, Tuple, Union
+from typing import Callable, Generic, Iterable, List, Optional, Tuple, Union
 
 from tqdm import tqdm
 
-from .types import Parser, T, Transformer
+from .types import T
 from .util import is_empty, safe_move
 
 
 class Tree(Generic[T]):
     root: Path
     glob: str
-    parse: Parser[T]
+    parse: Optional[Callable[[Path], T]]
     show_progress: bool
 
     sources: Tuple[Path, ...]
     destinations: List[Path]
-    transformations: List[Transformer[T]]
-    should_resolve: bool
+    transformations: List[Callable[[T], Path]]
 
     def __init__(
         self,
         root_folder: Union[str, os.PathLike[str]],
+        parse: Optional[Callable[[Path], T]] = None,
         glob: str = "**/*.*",
-        parse: Parser[T] = Path,
         show_progress: bool = False,
     ):
         self.root = Path(root_folder)
         self.glob = glob
         self.parse = parse
         self.show_progress = show_progress
-        self.reset()
+        self.refresh()
 
-    def reset(self) -> Tree:
+    def refresh(self) -> Tree:
         self.sources = tuple(self.root.glob(self.glob))
         self.destinations = list(self.sources)
         self.transformations = list()
 
         return self
 
-    def transform(self, *transformations: Transformer[T]) -> None:
+    def transform(self, *transformations: Callable[[T], Path]) -> None:
         for transform in transformations:
             self.transformations.append(transform)
 
     def resolve(self) -> Tree:
         # Parse files
-        with ProcessPoolExecutor() as executor:
-            parsed_sources = executor.map(self.parse, self.sources)
+        parsed_sources: Iterable
+        if self.parse is not None:
+            with ProcessPoolExecutor() as executor:
+                parsed_sources = executor.map(self.parse, self.sources)
+        else:
+            parsed_sources = self.sources
 
         # Perform transformations
         if self.show_progress:
@@ -59,6 +62,7 @@ class Tree(Generic[T]):
         for i, parsed_source in enumerate(parsed_sources):
             try:
                 for transform in self.transformations:
+                    # TODO: Figure out better framework for transformations
                     self.destinations[i] = transform(parsed_source)
             except Exception as e:
                 self.destinations[i] = self.root / e.__class__.__name__ / self.destinations[i].name
@@ -73,7 +77,7 @@ class Tree(Generic[T]):
             if is_empty(source.parent, ignore_dirs=True):
                 shutil.rmtree(source.parent)
 
-        self.reset()
+        self.refresh()
 
         return self
 
