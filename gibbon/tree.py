@@ -9,6 +9,7 @@ from typing import Generic, List, Tuple, Union
 from tqdm import tqdm
 
 from .types import Parser, T, Transformer
+from .util import is_empty, safe_move
 
 
 class Tree(Generic[T]):
@@ -47,46 +48,30 @@ class Tree(Generic[T]):
             self.transformations.append(transform)
 
     def resolve(self) -> Tree:
+        # Parse files
         with ProcessPoolExecutor() as executor:
             parsed_sources = executor.map(self.parse, self.sources)
-        destinations = self.destinations
+
+        # Perform transformations
         if self.show_progress:
-            parsed_sources = tqdm(parsed_sources, desc="Process paths", total=len(self.sources))
-            destinations = tqdm(destinations, desc="Move paths")
+            parsed_sources = tqdm(parsed_sources, desc="Process files", total=len(self.sources))
 
         for i, parsed_source in enumerate(parsed_sources):
-            # Perform transformations
             try:
                 for transform in self.transformations:
                     self.destinations[i] = transform(parsed_source)
             except Exception as e:
                 self.destinations[i] = self.root / e.__class__.__name__ / self.destinations[i].name
 
-        for i, destination in enumerate(destinations):
-            # Rename if duplicate
-            num_duplicates = 0
-            new_name = destination.name
-            while True:
-                renamed = False
-                for j, other in enumerate(self.destinations):
-                    if new_name == other.name and i != j:
-                        num_duplicates += 1
-                        renamed = True
-                        new_name = f"{destination.stem} ({num_duplicates}){destination.suffix}"
+        # Move files
+        paths = zip(self.sources, self.destinations)
+        if self.show_progress:
+            paths = tqdm(paths, desc="Move files", total=len(self.sources))
 
-                if not renamed:
-                    self.destinations[i] = destination.parent / new_name
-                    break
-
-            # Move file
-            os.makedirs(destination.parent, exist_ok=True)
-            shutil.move(str(self.sources[i]), str(self.destinations[i]))
-
-        # Remove empty folders
-        for path in self.root.rglob("*"):
-            if path.is_dir() and len([p for p in path.rglob("*") if not p.is_dir()]) == 0:
-                if path.exists():
-                    shutil.rmtree(path)
+        for source, destination in paths:
+            safe_move(source, destination)
+            if is_empty(source.parent, ignore_dirs=True):
+                shutil.rmtree(source.parent)
 
         self.reset()
 
