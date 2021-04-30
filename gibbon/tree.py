@@ -19,7 +19,6 @@ class Tree(Generic[T]):
     show_progress: bool
 
     sources: Tuple[Path, ...]
-    destinations: List[Path]
     transformations: List[Callable[[T], Path]]
 
     def __init__(
@@ -37,7 +36,6 @@ class Tree(Generic[T]):
 
     def refresh(self) -> Tree:
         self.sources = tuple(self.root.glob(self.glob))
-        self.destinations = list(self.sources)
         self.transformations = list()
 
         return self
@@ -48,27 +46,31 @@ class Tree(Generic[T]):
 
     def resolve(self) -> Tree:
         # Parse files
-        parsed_sources: Iterable
+        parsed_sources: Iterable[Tuple]
         if self.parse is not None:
             with ProcessPoolExecutor() as executor:
-                parsed_sources = executor.map(self.parse, self.sources)
+                parsed_sources = zip(self.sources, executor.map(self.parse, self.sources))
         else:
-            parsed_sources = self.sources
+            parsed_sources = zip(self.sources, self.sources)
 
         # Perform transformations
         if self.show_progress:
             parsed_sources = tqdm(parsed_sources, desc="Process files", total=len(self.sources))
 
-        for i, parsed_source in enumerate(parsed_sources):
+        destinations = list()
+        for source, parsed in parsed_sources:
+            destination = source
             try:
                 for transform in self.transformations:
                     # TODO: Figure out better framework for transformations
-                    self.destinations[i] = transform(parsed_source)
+                    destination = transform(parsed)
             except Exception as e:
-                self.destinations[i] = self.root / e.__class__.__name__ / self.destinations[i].name
+                destination = self.root / e.__class__.__name__ / destination.name
+            destinations.append(destination)
 
         # Move files
-        paths = zip(self.sources, self.destinations)
+        paths = zip(self.sources, destinations)
+
         if self.show_progress:
             paths = tqdm(paths, desc="Move files", total=len(self.sources))
 
