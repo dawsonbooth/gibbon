@@ -29,12 +29,12 @@ def flatten(name: str) -> Path:
 
 
 def restore():
-    with Tree(root_folder, parse=parse) as tree:
+    with Tree(root_folder, glob="**/*.txt", parse=parse) as tree:
         tree.transform(flatten)
 
 
 def test_flatten():
-    with Tree(root_folder, parse=parse) as tree:
+    with Tree(root_folder, glob="**/*.txt", parse=parse) as tree:
         tree.transform(flatten)
 
     hierarchy = set(root_folder.glob("*.*"))
@@ -45,7 +45,7 @@ def test_flatten():
 
 
 def test_organize():
-    with Tree(root_folder, parse=parse) as tree:
+    with Tree(root_folder, glob="**/*.txt", parse=parse) as tree:
         tree.transform(organize)
 
     hierarchy = set(root_folder.rglob("*.*"))

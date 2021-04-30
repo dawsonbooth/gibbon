@@ -25,8 +25,8 @@ class Tree(Generic[T]):
     def __init__(
         self,
         root_folder: Union[str, os.PathLike[str]],
+        glob: str,
         parse: Optional[Callable[[Path], T]] = None,
-        glob: str = "**/*.*",
         show_progress: bool = False,
     ):
         self.root = Path(root_folder)
