@@ -4,29 +4,29 @@ import os
 import shutil
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
-from typing import Callable, Generic, List, Tuple, Union
+from typing import Generic, List, Tuple, Union
 
 from tqdm import tqdm
 
-from .types import T
+from .types import Parser, T, Transformer
 
 
 class Tree(Generic[T]):
     root: Path
     glob: str
-    # parse: Callable[[Path], T]  # FIXME: https://github.com/python/mypy/issues/708
+    parse: Parser[T]
     show_progress: bool
 
     sources: Tuple[Path, ...]
     destinations: List[Path]
-    transformations: List[Callable[[T], Path]]  # FIXME: https://github.com/python/mypy/issues/3737
+    transformations: List[Transformer[T]]
     should_resolve: bool
 
     def __init__(
         self,
         root_folder: Union[str, os.PathLike[str]],
         glob: str = "**/*.*",
-        parse: Callable[[Path], T] = Path,  # type: ignore  # FIXME: https://github.com/python/mypy/issues/3737
+        parse: Parser[T] = Path,
         show_progress: bool = False,
     ):
         self.root = Path(root_folder)
@@ -42,7 +42,7 @@ class Tree(Generic[T]):
 
         return self
 
-    def transform(self, *transformations: Callable[[T], Path]) -> None:
+    def transform(self, *transformations: Transformer[T]) -> None:
         for transform in transformations:
             self.transformations.append(transform)
 
