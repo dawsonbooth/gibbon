@@ -18,8 +18,8 @@ class Tree(Generic[T]):
     parse: Optional[Callable[[Path], T]]
     show_progress: bool
 
-    sources: Tuple[Path, ...]
-    transformations: List[Callable[[T], Path]]
+    sources: Tuple[Path, ...] = tuple()
+    transformations: List[Callable[[T], Path]] = list()
 
     def __init__(
         self,
@@ -32,19 +32,24 @@ class Tree(Generic[T]):
         self.glob = glob
         self.parse = parse
         self.show_progress = show_progress
+
         self.refresh()
 
-    def refresh(self) -> Tree:
+    def refresh(self) -> Tree[T]:
         self.sources = tuple(self.root.glob(self.glob))
-        self.transformations = list()
 
         return self
 
-    def transform(self, *transformations: Callable[[T], Path]) -> None:
-        for transform in transformations:
-            self.transformations.append(transform)
+    def should_resolve(self) -> bool:
+        return len(self.transformations) > 0
 
-    def resolve(self) -> Tree:
+    def transform(self, *transformations: Callable[[T], Path]) -> None:
+        self.transformations.extend(transformations)
+
+    def resolve(self) -> Tree[T]:
+        if not self.should_resolve():
+            return self
+
         # Parse files
         parsed_sources: Iterable[Tuple]
         if self.parse is not None:
@@ -54,6 +59,7 @@ class Tree(Generic[T]):
             parsed_sources = zip(self.sources, self.sources)
 
         # Perform transformations
+        # TODO: Figure out better framework for transformations
         if self.show_progress:
             parsed_sources = tqdm(parsed_sources, desc="Process files", total=len(self.sources))
 
@@ -62,11 +68,11 @@ class Tree(Generic[T]):
             destination = source
             try:
                 for transform in self.transformations:
-                    # TODO: Figure out better framework for transformations
                     destination = transform(parsed)
             except Exception as e:
                 destination = self.root / e.__class__.__name__ / destination.name
             destinations.append(destination)
+        self.transformations.clear()
 
         # Move files
         paths = zip(self.sources, destinations)
