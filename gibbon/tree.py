@@ -8,7 +8,7 @@ from typing import Callable, Dict, Generic, Iterable, Optional, Tuple, Union
 
 from tqdm import tqdm
 
-from .types import Operation, Hierarchy, T
+from .types import Hierarchy, Operation, T
 from .util import is_empty, safe_move
 
 
@@ -22,7 +22,8 @@ def build_parent(item: T, ordering: Hierarchy) -> Path:
 
 
 class Tree(Generic[T]):
-    root: Path  # TODO: Have separate source and destination root folders
+    root_src: Path
+    root_dest: Path
     glob: str
     parse: Optional[Callable[[Path], T]]
     show_progress: bool
@@ -32,12 +33,14 @@ class Tree(Generic[T]):
 
     def __init__(
         self,
-        root_folder: Union[str, os.PathLike[str]],
+        root_src: Union[str, os.PathLike[str]],
         glob: str,
+        root_dest: Optional[Union[str, os.PathLike[str]]] = None,
         parse: Optional[Callable[[Path], T]] = None,
         show_progress: bool = False,
     ):
-        self.root = Path(root_folder)
+        self.root_src = Path(root_src)
+        self.root_dest = Path(root_dest or root_src)
         self.glob = glob
         self.parse = parse
         self.show_progress = show_progress
@@ -45,7 +48,7 @@ class Tree(Generic[T]):
         self.refresh()
 
     def refresh(self) -> Tree[T]:
-        self.sources = tuple(self.root.glob(self.glob))
+        self.sources = tuple(self.root_src.glob(self.glob))
 
         return self
 
@@ -53,13 +56,13 @@ class Tree(Generic[T]):
         return len(self.operations) > 0
 
     def organize(self, ordering: Hierarchy) -> Tree:
-        self.operations["organize"] = lambda path, item: self.root / build_parent(item, ordering) / path.name
+        self.operations["organize"] = lambda path, item: self.root_dest / build_parent(item, ordering) / path.name
         self.operations.pop("flatten", None)
 
         return self
 
     def flatten(self) -> Tree:
-        self.operations["flatten"] = lambda path, _: self.root / path.name
+        self.operations["flatten"] = lambda path, _: self.root_dest / path.name
         self.operations.pop("organize", None)
 
         return self
@@ -93,7 +96,7 @@ class Tree(Generic[T]):
                 for operate in self.operations.values():
                     destination = operate(destination, parsed)
             except Exception as e:
-                destination = self.root / e.__class__.__name__ / destination.name
+                destination = self.root_dest / e.__class__.__name__ / destination.name
             destinations.append(destination)
         self.operations.clear()
 
