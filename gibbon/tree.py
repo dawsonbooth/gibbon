@@ -52,9 +52,6 @@ class Tree(Generic[T]):
 
         return self
 
-    def should_resolve(self) -> bool:
-        return len(self.operations) > 0
-
     def organize(self, ordering: Hierarchy) -> Tree:
         self.operations["organize"] = lambda path, item: self.root_dest / build_parent(item, ordering) / path.name
         self.operations.pop("flatten", None)
@@ -73,7 +70,7 @@ class Tree(Generic[T]):
         return self
 
     def resolve(self) -> Tree[T]:
-        if not self.should_resolve():
+        if len(self.operations) == 0:
             return self
 
         # Parse files
