@@ -8,34 +8,26 @@ original_hierarchy = set(root_folder.rglob("*.*"))
 
 
 def parse(path: Path) -> str:
-    return path.name
+    name = path.name
+    return name[: name.index(".")]
 
 
-def organize(name: str) -> Path:
-    stem = name[: name.index(".")]
+def alpha_or_numeric(stem: str) -> str:
     if stem.isalpha():
-        return root_folder / "alpha" / name
+        return "alpha"
     elif stem.isnumeric():
-        if bool(int(stem) % 2):
-            return root_folder / "numeric" / "odd" / name
-        else:
-            return root_folder / "numeric" / "even" / name
-    else:
-        return root_folder / "ERROR"
-
-
-def flatten(name: str) -> Path:
-    return root_folder / name
+        return "numeric"
+    return "other"
 
 
 def restore():
     with Tree(root_folder, glob="**/*.txt", parse=parse) as tree:
-        tree.transform(flatten)
+        tree.flatten()
 
 
 def test_flatten():
     with Tree(root_folder, glob="**/*.txt", parse=parse) as tree:
-        tree.transform(flatten)
+        tree.flatten()
 
     hierarchy = set(root_folder.glob("*.*"))
 
@@ -46,7 +38,7 @@ def test_flatten():
 
 def test_organize():
     with Tree(root_folder, glob="**/*.txt", parse=parse) as tree:
-        tree.transform(organize)
+        tree.organize((alpha_or_numeric,))
 
     hierarchy = set(root_folder.rglob("*.*"))
 

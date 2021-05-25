@@ -4,22 +4,31 @@ import os
 import shutil
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
-from typing import Callable, Generic, Iterable, List, Optional, Tuple, Union
+from typing import Callable, Dict, Generic, Iterable, Optional, Tuple, Union
 
 from tqdm import tqdm
 
-from .types import T
+from .types import Operation, Hierarchy, T
 from .util import is_empty, safe_move
 
 
+def build_parent(item: T, ordering: Hierarchy) -> Path:
+    parent = Path()
+
+    for getter in ordering:
+        parent /= str(getter(item))
+
+    return parent
+
+
 class Tree(Generic[T]):
-    root: Path
+    root: Path  # TODO: Have separate source and destination root folders
     glob: str
     parse: Optional[Callable[[Path], T]]
     show_progress: bool
 
     sources: Tuple[Path, ...] = tuple()
-    transformations: List[Callable[[T], Path]] = list()
+    operations: Dict[str, Operation] = dict()
 
     def __init__(
         self,
@@ -41,10 +50,24 @@ class Tree(Generic[T]):
         return self
 
     def should_resolve(self) -> bool:
-        return len(self.transformations) > 0
+        return len(self.operations) > 0
 
-    def transform(self, *transformations: Callable[[T], Path]) -> None:
-        self.transformations.extend(transformations)
+    def organize(self, ordering: Hierarchy) -> Tree:
+        self.operations["organize"] = lambda path, item: self.root / build_parent(item, ordering) / path.name
+        self.operations.pop("flatten", None)
+
+        return self
+
+    def flatten(self) -> Tree:
+        self.operations["flatten"] = lambda path, _: self.root / path.name
+        self.operations.pop("organize", None)
+
+        return self
+
+    def rename(self, create_filename: Callable[[T], str]) -> Tree:
+        self.operations["rename"] = lambda path, item: path.parent / create_filename(item)
+
+        return self
 
     def resolve(self) -> Tree[T]:
         if not self.should_resolve():
@@ -67,12 +90,12 @@ class Tree(Generic[T]):
         for source, parsed in parsed_sources:
             destination = source
             try:
-                for transform in self.transformations:
-                    destination = transform(parsed)
+                for operate in self.operations.values():
+                    destination = operate(destination, parsed)
             except Exception as e:
                 destination = self.root / e.__class__.__name__ / destination.name
             destinations.append(destination)
-        self.transformations.clear()
+        self.operations.clear()
 
         # Move files
         paths = zip(self.sources, destinations)
