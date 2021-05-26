@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gibbon"
-version = "0.1.1"
+version = "0.1.2"
 description = ""
 authors = ["Dawson Booth <pypi@dawsonbooth.com>"]
 license = "MIT"
@@ -22,7 +22,7 @@ packages = [{ include = "gibbon" }]
 gibbon = "gibbon.__main__:main"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 tqdm = "^4.59.0"
 
 [tool.poetry.dev-dependencies]
