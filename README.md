@@ -9,7 +9,7 @@
 
 ## Description
 
-This is a short or long textual description of the package.
+Organize the files in your filesystem according to their attributes.
 
 ## Installation
 
@@ -24,26 +24,10 @@ python -m pip install gibbon
 The following is an example usage of the package:
 
 ```python
-from foo import bar
+from gibbon import Tree
 
-print("Ok here we go")
-
-try:
-    bar()
-except:
-    print("Ah good effort")
-```
-
-Some info about calling the program.
-
-```bash
-python whatever.py > out.txt
-```
-
-Then some output (console or file whatever)
-
-```txt
-Output here I guess
+with Tree("/path/to/root/folder/", glob="**/*.txt") as tree:
+    tree.flatten()
 ```
 
 Feel free to [check out the docs](https://dawsonbooth.github.io/gibbon/) for more information.
