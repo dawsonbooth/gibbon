@@ -73,28 +73,29 @@ class Tree(Generic[T]):
         if len(self.operations) == 0:
             return self
 
-        # Parse files
-        parsed_sources: Iterable[Tuple]
-        if self.parse is not None:
-            with ProcessPoolExecutor() as executor:
+        # Process files
+        with ProcessPoolExecutor(1) as executor:
+            # Parse files
+            parsed_sources: Iterable[Tuple]
+            if self.parse is not None:
                 parsed_sources = zip(self.sources, executor.map(self.parse, self.sources))
-        else:
-            parsed_sources = zip(self.sources, self.sources)
+            else:
+                parsed_sources = zip(self.sources, self.sources)
 
-        # Perform operations
-        if self.show_progress:
-            parsed_sources = tqdm(parsed_sources, desc="Process files", total=len(self.sources))
+            # Perform operations
+            if self.show_progress:
+                parsed_sources = tqdm(parsed_sources, desc="Process files", total=len(self.sources))
 
-        destinations = list()
-        for source, parsed in parsed_sources:
-            destination = source
-            try:
-                for operate in self.operations.values():
-                    destination = operate(destination, parsed)
-            except Exception as e:
-                destination = self.root_dest / e.__class__.__name__ / destination.name
-            destinations.append(destination)
-        self.operations.clear()
+            destinations = list()
+            for source, parsed in parsed_sources:
+                destination = source
+                try:
+                    for operate in self.operations.values():
+                        destination = operate(destination, parsed)
+                except Exception as e:
+                    destination = self.root_dest / e.__class__.__name__ / destination.name
+                destinations.append(destination)
+            self.operations.clear()
 
         # Move files
         paths = zip(self.sources, destinations)
