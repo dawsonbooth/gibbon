@@ -74,7 +74,7 @@ class Tree(Generic[T]):
             return self
 
         # Process files
-        with ProcessPoolExecutor(1) as executor:
+        with ProcessPoolExecutor() as executor:
             # Parse files
             parsed_sources: Iterable[Tuple]
             if self.parse is not None:
