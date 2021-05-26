@@ -661,45 +661,47 @@
 
 <span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">self</span><span class="w"></span>
 
-<span class="w">        </span><span class="err">#</span><span class="w"> </span><span class="nf">Parse</span><span class="w"> </span><span class="n">files</span><span class="w"></span>
+<span class="w">        </span><span class="err">#</span><span class="w"> </span><span class="n">Process</span><span class="w"> </span><span class="n">files</span><span class="w"></span>
 
-<span class="w">        </span><span class="nl">parsed_sources</span><span class="p">:</span><span class="w"> </span><span class="n">Iterable</span><span class="o">[</span><span class="n">Tuple</span><span class="o">]</span><span class="w"></span>
+<span class="w">        </span><span class="k">with</span><span class="w"> </span><span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nl">executor</span><span class="p">:</span><span class="w"></span>
 
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="nf">parse</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="k">None</span><span class="err">:</span><span class="w"></span>
+<span class="w">            </span><span class="err">#</span><span class="w"> </span><span class="nf">Parse</span><span class="w"> </span><span class="n">files</span><span class="w"></span>
 
-<span class="w">            </span><span class="k">with</span><span class="w"> </span><span class="n">ProcessPoolExecutor</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nl">executor</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="nl">parsed_sources</span><span class="p">:</span><span class="w"> </span><span class="n">Iterable</span><span class="o">[</span><span class="n">Tuple</span><span class="o">]</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="nf">parse</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="k">None</span><span class="err">:</span><span class="w"></span>
 
 <span class="w">                </span><span class="n">parsed_sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zip</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">,</span><span class="w"> </span><span class="n">executor</span><span class="p">.</span><span class="k">map</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="nf">parse</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">))</span><span class="w"></span>
 
-<span class="w">        </span><span class="k">else</span><span class="err">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="err">:</span><span class="w"></span>
 
-<span class="w">            </span><span class="n">parsed_sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zip</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">parsed_sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zip</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">)</span><span class="w"></span>
 
-<span class="w">        </span><span class="err">#</span><span class="w"> </span><span class="n">Perform</span><span class="w"> </span><span class="n">operations</span><span class="w"></span>
+<span class="w">            </span><span class="err">#</span><span class="w"> </span><span class="n">Perform</span><span class="w"> </span><span class="n">operations</span><span class="w"></span>
 
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="nl">show_progress</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="nl">show_progress</span><span class="p">:</span><span class="w"></span>
 
-<span class="w">            </span><span class="n">parsed_sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tqdm</span><span class="p">(</span><span class="n">parsed_sources</span><span class="p">,</span><span class="w"> </span><span class="k">desc</span><span class="o">=</span><span class="ss">&quot;Process files&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">total</span><span class="o">=</span><span class="nf">len</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">))</span><span class="w"></span>
+<span class="w">                </span><span class="n">parsed_sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tqdm</span><span class="p">(</span><span class="n">parsed_sources</span><span class="p">,</span><span class="w"> </span><span class="k">desc</span><span class="o">=</span><span class="ss">&quot;Process files&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">total</span><span class="o">=</span><span class="nf">len</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">))</span><span class="w"></span>
 
-<span class="w">        </span><span class="n">destinations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">list</span><span class="p">()</span><span class="w"></span>
+<span class="w">            </span><span class="n">destinations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">list</span><span class="p">()</span><span class="w"></span>
 
-<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">source</span><span class="p">,</span><span class="w"> </span><span class="n">parsed</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nl">parsed_sources</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="n">source</span><span class="p">,</span><span class="w"> </span><span class="n">parsed</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nl">parsed_sources</span><span class="p">:</span><span class="w"></span>
 
-<span class="w">            </span><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">source</span><span class="w"></span>
+<span class="w">                </span><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">source</span><span class="w"></span>
 
-<span class="w">            </span><span class="k">try</span><span class="err">:</span><span class="w"></span>
+<span class="w">                </span><span class="k">try</span><span class="err">:</span><span class="w"></span>
 
-<span class="w">                </span><span class="k">for</span><span class="w"> </span><span class="n">operate</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">operations</span><span class="p">.</span><span class="k">values</span><span class="p">()</span><span class="err">:</span><span class="w"></span>
+<span class="w">                    </span><span class="k">for</span><span class="w"> </span><span class="n">operate</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">operations</span><span class="p">.</span><span class="k">values</span><span class="p">()</span><span class="err">:</span><span class="w"></span>
 
-<span class="w">                    </span><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">operate</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span><span class="w"> </span><span class="n">parsed</span><span class="p">)</span><span class="w"></span>
+<span class="w">                        </span><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">operate</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span><span class="w"> </span><span class="n">parsed</span><span class="p">)</span><span class="w"></span>
 
-<span class="w">            </span><span class="ow">except</span><span class="w"> </span><span class="k">Exception</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nl">e</span><span class="p">:</span><span class="w"></span>
+<span class="w">                </span><span class="ow">except</span><span class="w"> </span><span class="k">Exception</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nl">e</span><span class="p">:</span><span class="w"></span>
 
-<span class="w">                </span><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">root_dest</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">__class__</span><span class="p">.</span><span class="n">__name__</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">destination</span><span class="p">.</span><span class="n">name</span><span class="w"></span>
+<span class="w">                    </span><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">root_dest</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">__class__</span><span class="p">.</span><span class="n">__name__</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">destination</span><span class="p">.</span><span class="n">name</span><span class="w"></span>
 
-<span class="w">            </span><span class="n">destinations</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">destinations</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span><span class="w"></span>
 
-<span class="w">        </span><span class="n">self</span><span class="p">.</span><span class="n">operations</span><span class="p">.</span><span class="n">clear</span><span class="p">()</span><span class="w"></span>
+<span class="w">            </span><span class="n">self</span><span class="p">.</span><span class="n">operations</span><span class="p">.</span><span class="n">clear</span><span class="p">()</span><span class="w"></span>
 
 <span class="w">        </span><span class="err">#</span><span class="w"> </span><span class="n">Move</span><span class="w"> </span><span class="n">files</span><span class="w"></span>
 
@@ -832,45 +834,47 @@
 
 <span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">self</span><span class="w"></span>
 
-<span class="w">        </span><span class="err">#</span><span class="w"> </span><span class="nf">Parse</span><span class="w"> </span><span class="n">files</span><span class="w"></span>
+<span class="w">        </span><span class="err">#</span><span class="w"> </span><span class="n">Process</span><span class="w"> </span><span class="n">files</span><span class="w"></span>
 
-<span class="w">        </span><span class="nl">parsed_sources</span><span class="p">:</span><span class="w"> </span><span class="n">Iterable</span><span class="o">[</span><span class="n">Tuple</span><span class="o">]</span><span class="w"></span>
+<span class="w">        </span><span class="k">with</span><span class="w"> </span><span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nl">executor</span><span class="p">:</span><span class="w"></span>
 
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="nf">parse</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="k">None</span><span class="err">:</span><span class="w"></span>
+<span class="w">            </span><span class="err">#</span><span class="w"> </span><span class="nf">Parse</span><span class="w"> </span><span class="n">files</span><span class="w"></span>
 
-<span class="w">            </span><span class="k">with</span><span class="w"> </span><span class="n">ProcessPoolExecutor</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nl">executor</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="nl">parsed_sources</span><span class="p">:</span><span class="w"> </span><span class="n">Iterable</span><span class="o">[</span><span class="n">Tuple</span><span class="o">]</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="nf">parse</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="k">None</span><span class="err">:</span><span class="w"></span>
 
 <span class="w">                </span><span class="n">parsed_sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zip</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">,</span><span class="w"> </span><span class="n">executor</span><span class="p">.</span><span class="k">map</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="nf">parse</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">))</span><span class="w"></span>
 
-<span class="w">        </span><span class="k">else</span><span class="err">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="err">:</span><span class="w"></span>
 
-<span class="w">            </span><span class="n">parsed_sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zip</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">parsed_sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zip</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">)</span><span class="w"></span>
 
-<span class="w">        </span><span class="err">#</span><span class="w"> </span><span class="n">Perform</span><span class="w"> </span><span class="n">operations</span><span class="w"></span>
+<span class="w">            </span><span class="err">#</span><span class="w"> </span><span class="n">Perform</span><span class="w"> </span><span class="n">operations</span><span class="w"></span>
 
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="nl">show_progress</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="nl">show_progress</span><span class="p">:</span><span class="w"></span>
 
-<span class="w">            </span><span class="n">parsed_sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tqdm</span><span class="p">(</span><span class="n">parsed_sources</span><span class="p">,</span><span class="w"> </span><span class="k">desc</span><span class="o">=</span><span class="ss">&quot;Process files&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">total</span><span class="o">=</span><span class="nf">len</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">))</span><span class="w"></span>
+<span class="w">                </span><span class="n">parsed_sources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tqdm</span><span class="p">(</span><span class="n">parsed_sources</span><span class="p">,</span><span class="w"> </span><span class="k">desc</span><span class="o">=</span><span class="ss">&quot;Process files&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">total</span><span class="o">=</span><span class="nf">len</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">sources</span><span class="p">))</span><span class="w"></span>
 
-<span class="w">        </span><span class="n">destinations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">list</span><span class="p">()</span><span class="w"></span>
+<span class="w">            </span><span class="n">destinations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">list</span><span class="p">()</span><span class="w"></span>
 
-<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">source</span><span class="p">,</span><span class="w"> </span><span class="n">parsed</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nl">parsed_sources</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="n">source</span><span class="p">,</span><span class="w"> </span><span class="n">parsed</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nl">parsed_sources</span><span class="p">:</span><span class="w"></span>
 
-<span class="w">            </span><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">source</span><span class="w"></span>
+<span class="w">                </span><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">source</span><span class="w"></span>
 
-<span class="w">            </span><span class="k">try</span><span class="err">:</span><span class="w"></span>
+<span class="w">                </span><span class="k">try</span><span class="err">:</span><span class="w"></span>
 
-<span class="w">                </span><span class="k">for</span><span class="w"> </span><span class="n">operate</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">operations</span><span class="p">.</span><span class="k">values</span><span class="p">()</span><span class="err">:</span><span class="w"></span>
+<span class="w">                    </span><span class="k">for</span><span class="w"> </span><span class="n">operate</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">operations</span><span class="p">.</span><span class="k">values</span><span class="p">()</span><span class="err">:</span><span class="w"></span>
 
-<span class="w">                    </span><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">operate</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span><span class="w"> </span><span class="n">parsed</span><span class="p">)</span><span class="w"></span>
+<span class="w">                        </span><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">operate</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span><span class="w"> </span><span class="n">parsed</span><span class="p">)</span><span class="w"></span>
 
-<span class="w">            </span><span class="ow">except</span><span class="w"> </span><span class="k">Exception</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nl">e</span><span class="p">:</span><span class="w"></span>
+<span class="w">                </span><span class="ow">except</span><span class="w"> </span><span class="k">Exception</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nl">e</span><span class="p">:</span><span class="w"></span>
 
-<span class="w">                </span><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">root_dest</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">__class__</span><span class="p">.</span><span class="n">__name__</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">destination</span><span class="p">.</span><span class="n">name</span><span class="w"></span>
+<span class="w">                    </span><span class="n">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">root_dest</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">__class__</span><span class="p">.</span><span class="n">__name__</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">destination</span><span class="p">.</span><span class="n">name</span><span class="w"></span>
 
-<span class="w">            </span><span class="n">destinations</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">destinations</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span><span class="w"></span>
 
-<span class="w">        </span><span class="n">self</span><span class="p">.</span><span class="n">operations</span><span class="p">.</span><span class="n">clear</span><span class="p">()</span><span class="w"></span>
+<span class="w">            </span><span class="n">self</span><span class="p">.</span><span class="n">operations</span><span class="p">.</span><span class="n">clear</span><span class="p">()</span><span class="w"></span>
 
 <span class="w">        </span><span class="err">#</span><span class="w"> </span><span class="n">Move</span><span class="w"> </span><span class="n">files</span><span class="w"></span>
 
