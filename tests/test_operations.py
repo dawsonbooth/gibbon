@@ -8,8 +8,7 @@ original_hierarchy = set(root_folder.rglob("*.*"))
 
 
 def parse(path: Path) -> str:
-    name = path.name
-    return name[: name.index(".")]
+    return path.stem
 
 
 def alpha_or_numeric(stem: str) -> str:
