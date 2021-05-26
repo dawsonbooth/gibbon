@@ -8,11 +8,11 @@ from typing import Callable, Dict, Generic, Iterable, Optional, Tuple, Union
 
 from tqdm import tqdm
 
-from .types import Hierarchy, Operation, T
+from .types import Stringable, T
 from .util import is_empty, safe_move
 
 
-def build_parent(item: T, ordering: Hierarchy) -> Path:
+def build_parent(item: T, *ordering: Callable[[T], Stringable]) -> Path:
     parent = Path()
 
     for getter in ordering:
@@ -29,7 +29,7 @@ class Tree(Generic[T]):
     show_progress: bool
 
     sources: Tuple[Path, ...] = tuple()
-    operations: Dict[str, Operation] = dict()
+    operations: Dict[str, Callable[[Path, T], Path]] = dict()
 
     def __init__(
         self,
@@ -52,8 +52,8 @@ class Tree(Generic[T]):
 
         return self
 
-    def organize(self, ordering: Hierarchy) -> Tree:
-        self.operations["organize"] = lambda path, item: self.root_dest / build_parent(item, ordering) / path.name
+    def organize(self, *ordering: Callable[[T], Stringable]) -> Tree:
+        self.operations["organize"] = lambda path, item: self.root_dest / build_parent(item, *ordering) / path.name
         self.operations.pop("flatten", None)
 
         return self
@@ -81,8 +81,7 @@ class Tree(Generic[T]):
         else:
             parsed_sources = zip(self.sources, self.sources)
 
-        # Perform transformations
-        # TODO: Figure out better framework for transformations
+        # Perform operations
         if self.show_progress:
             parsed_sources = tqdm(parsed_sources, desc="Process files", total=len(self.sources))
 

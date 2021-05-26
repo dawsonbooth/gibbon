@@ -1,10 +1,10 @@
-from pathlib import Path
-from typing import Callable, Sequence, TypeVar
+from typing import TypeVar
 
 T = TypeVar("T")
 
-Getter = Callable[[T], str]
 
-Hierarchy = Sequence[Getter]
+class Stringable:
+    ...
 
-Operation = Callable[[Path, T], Path]
+    def __str__(self) -> str:
+        ...
